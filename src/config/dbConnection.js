@@ -101,7 +101,7 @@ class DatabaseConnection {
    */
   async query(sql, params = []) {
     try {
-      const [rows] = await this.pool.execute(sql, params);
+      const [rows] = await this.pool.query(sql, params);
       return rows;
     } catch (error) {
       logger.error('数据库查询错误:', error);
