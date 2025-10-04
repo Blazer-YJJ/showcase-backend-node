@@ -1,5 +1,13 @@
 /*
  * @Author: JingChengCool jingchengcool@outlook.com
+ * @Date: 2025-10-03 08:07:02
+ * @LastEditors: JingChengCool jingchengcool@outlook.com
+ * @LastEditTime: 2025-10-03 15:21:54
+ * @FilePath: \showcase-backend-node\src\middleware\userAuth.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+/*
+ * @Author: JingChengCool jingchengcool@outlook.com
  * @Date: 2025-01-28 15:30:00
  * @LastEditors: JingChengCool jingchengcool@outlook.com
  * @LastEditTime: 2025-10-03 09:13:50

@@ -1,3 +1,4 @@
+
 -- MySQL dump 10.13  Distrib 8.0.39, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: showcase_backend
@@ -52,15 +53,15 @@ DROP TABLE IF EXISTS `admins`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `admins` (
   `admin_id` int NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '管理员名称',
-  `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '管理员账号',
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '管理员密码',
-  `level` enum('super','admin','editor') COLLATE utf8mb4_unicode_ci DEFAULT 'editor' COMMENT '管理员级别',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '管理员名称',
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '管理员账号',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '管理员密码',
+  `level` enum('super','admin','editor') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'editor' COMMENT '管理员级别',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`admin_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,6 +70,7 @@ CREATE TABLE `admins` (
 
 LOCK TABLES `admins` WRITE;
 /*!40000 ALTER TABLE `admins` DISABLE KEYS */;
+INSERT INTO `admins` (`admin_id`, `name`, `username`, `password`, `level`, `created_at`, `updated_at`) VALUES (1,'景丞','admin','$2b$10$0QCRluG/Zz0aEeCrvlre/eOCC93Ic6bTt3B21WZUDK.TpYs8hcNZW','super','2025-10-02 22:03:26','2025-10-03 03:08:22');
 /*!40000 ALTER TABLE `admins` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,7 +83,7 @@ DROP TABLE IF EXISTS `announcements`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `announcements` (
   `announcement_id` int NOT NULL AUTO_INCREMENT COMMENT '公告ID',
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告内容',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告内容',
   `is_active` tinyint(1) DEFAULT '1' COMMENT '是否启用',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -107,11 +109,11 @@ DROP TABLE IF EXISTS `categories`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categories` (
   `category_id` int NOT NULL AUTO_INCREMENT COMMENT '分类ID',
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类名称',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类名称',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品分类表';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品分类表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,6 +122,7 @@ CREATE TABLE `categories` (
 
 LOCK TABLES `categories` WRITE;
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
+INSERT INTO `categories` (`category_id`, `name`, `created_at`, `updated_at`) VALUES (2,'服装配饰','2025-10-03 03:58:37','2025-10-03 03:58:37'),(3,'家居用品','2025-10-03 03:58:37','2025-10-03 03:58:37'),(4,'食品饮料','2025-10-03 03:58:37','2025-10-03 03:58:37');
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -213,8 +216,8 @@ DROP TABLE IF EXISTS `limited_time_activities`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `limited_time_activities` (
   `activity_id` int NOT NULL AUTO_INCREMENT COMMENT '活动ID',
-  `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '活动标题',
-  `description` text COLLATE utf8mb4_unicode_ci COMMENT '活动简介',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '活动标题',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '活动简介',
   `start_time` timestamp NULL DEFAULT NULL COMMENT '活动开始时间',
   `end_time` timestamp NULL DEFAULT NULL COMMENT '活动结束时间',
   `is_active` tinyint(1) DEFAULT '1' COMMENT '是否启用',
@@ -269,7 +272,7 @@ DROP TABLE IF EXISTS `new_arrival_announcements`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `new_arrival_announcements` (
   `announcement_id` int NOT NULL AUTO_INCREMENT COMMENT '公告ID',
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告内容',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告内容',
   `is_active` tinyint(1) DEFAULT '1' COMMENT '是否启用',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -315,6 +318,35 @@ LOCK TABLES `new_arrival_products` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `product_images`
+--
+
+DROP TABLE IF EXISTS `product_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `product_images` (
+  `image_id` int NOT NULL AUTO_INCREMENT COMMENT '图片ID',
+  `product_id` int NOT NULL COMMENT '商品ID',
+  `image_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '图片路径',
+  `image_type` enum('main','sub','detail') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'sub' COMMENT '图片类型',
+  `sort_order` int DEFAULT '0' COMMENT '排序',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`image_id`),
+  KEY `idx_product_images_product` (`product_id`),
+  CONSTRAINT `product_images_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品图片表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product_images`
+--
+
+LOCK TABLES `product_images` WRITE;
+/*!40000 ALTER TABLE `product_images` DISABLE KEYS */;
+/*!40000 ALTER TABLE `product_images` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `product_params`
 --
 
@@ -324,8 +356,8 @@ DROP TABLE IF EXISTS `product_params`;
 CREATE TABLE `product_params` (
   `param_id` int NOT NULL AUTO_INCREMENT COMMENT '参数ID',
   `product_id` int NOT NULL COMMENT '商品ID',
-  `param_key` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '参数键',
-  `param_value` text COLLATE utf8mb4_unicode_ci COMMENT '参数值',
+  `param_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '参数键',
+  `param_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '参数值',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`param_id`),
   KEY `idx_product_params_product` (`product_id`),
@@ -352,9 +384,10 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `product_id` int NOT NULL AUTO_INCREMENT COMMENT '商品ID',
   `category_id` int NOT NULL COMMENT '所属分类ID',
-  `name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品名称',
-  `description` text COLLATE utf8mb4_unicode_ci COMMENT '商品简介',
-  `tags` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品标签',
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品名称',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '商品简介',
+  `price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '商品价格',
+  `tags` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品标签',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`product_id`),
@@ -382,9 +415,9 @@ DROP TABLE IF EXISTS `user_addresses`;
 CREATE TABLE `user_addresses` (
   `address_id` int NOT NULL AUTO_INCREMENT COMMENT '地址ID',
   `user_id` int NOT NULL COMMENT '用户ID',
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '收货人姓名',
-  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '联系电话',
-  `address` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '详细地址',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '收货人姓名',
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '联系电话',
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '详细地址',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`address_id`),
@@ -413,7 +446,7 @@ CREATE TABLE `user_cart` (
   `cart_id` int NOT NULL AUTO_INCREMENT COMMENT '购物车ID',
   `user_id` int NOT NULL COMMENT '用户ID',
   `product_id` int NOT NULL COMMENT '商品ID',
-  `item_note` text COLLATE utf8mb4_unicode_ci COMMENT '单个商品备注',
+  `item_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '单个商品备注',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`cart_id`),
@@ -475,10 +508,10 @@ CREATE TABLE `user_orders` (
   `order_id` int NOT NULL AUTO_INCREMENT COMMENT '订单ID',
   `user_id` int NOT NULL COMMENT '用户ID',
   `address_id` int NOT NULL COMMENT '用户地址ID',
-  `order_status` enum('pending','paid','shipped','delivered','cancelled') COLLATE utf8mb4_unicode_ci DEFAULT 'pending' COMMENT '订单状态',
+  `order_status` enum('pending','paid','shipped','delivered','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pending' COMMENT '订单状态',
   `product_id` int NOT NULL COMMENT '商品ID',
-  `item_note` text COLLATE utf8mb4_unicode_ci COMMENT '单个商品备注',
-  `order_note` text COLLATE utf8mb4_unicode_ci COMMENT '整体订单备注',
+  `item_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '单个商品备注',
+  `order_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '整体订单备注',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`order_id`),
@@ -510,15 +543,15 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `user_id` int NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户名称',
-  `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户账号',
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户密码',
-  `member_type` enum('normal','vip','svip') COLLATE utf8mb4_unicode_ci DEFAULT 'normal' COMMENT '会员类型',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户名称',
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户账号',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户密码',
+  `member_type` enum('normal','vip','svip') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'normal' COMMENT '会员类型',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -527,6 +560,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` (`user_id`, `name`, `username`, `password`, `member_type`, `created_at`, `updated_at`) VALUES (1,'JC黄金紫蜡','jccool','$2b$10$VTDL99B.xYZMn.Kb0aqIFeTqc6iTlLlv9f/OYpMX5Yt311LessvXm','vip','2025-10-03 01:18:47','2025-10-03 01:18:47'),(2,'新姓名','jccool2','$2b$10$oomfR99XDwJFL/cz07Zs9udm7pFdHcyQYoTlqIooieFDtl4BBuvVO','vip','2025-10-03 01:19:25','2025-10-03 01:58:37');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -543,4 +577,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-02 16:14:37
+-- Dump completed on 2025-10-03 16:50:16

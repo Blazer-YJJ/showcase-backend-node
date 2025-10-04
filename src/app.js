@@ -15,21 +15,81 @@ const redisConnection = require('./config/redisConnection');
 const indexRoutes = require('./routes/index');
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS配置 - 必须在helmet之前
+const corsOptions = {
+  origin: function (origin, callback) {
+    // 允许所有来源（开发环境）
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+};
+
+app.use(cors(corsOptions)); // 跨域支持
+
 // 中间件
-app.use(helmet()); // 安全头
-app.use(cors()); // 跨域支持
+app.use(helmet({
+  crossOriginResourcePolicy: false, // 禁用CORP策略
+  crossOriginEmbedderPolicy: false  // 禁用COEP策略
+})); // 安全头
 app.use(logger.middleware); // 自定义日志
 app.use(express.json()); // JSON解析
 app.use(express.urlencoded({ extended: true })); // URL编码解析
+
+// 静态文件服务 - 提供uploads目录访问
+app.use('/uploads', (req, res, next) => {
+  // 设置CORS头
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  
+  next();
+}, express.static('uploads', {
+  setHeaders: (res, path) => {
+    // 为静态文件设置CORS头
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
+// 专门的静态文件路由（确保CORS正确工作）
+app.get('/uploads/*', (req, res, next) => {
+  // 设置CORS头
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  
+  next();
+});
 
 // 路由
 app.use('/', indexRoutes);
 app.use('/api/admins', adminRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
 
 // 健康检查
 app.get('/health', async (req, res) => {
