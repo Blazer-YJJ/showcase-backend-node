@@ -966,6 +966,143 @@ class Product {
     
     return name;
   }
+
+  // 搜索商品（支持商品名称、分类名称、标签搜索）
+  static async search(options = {}) {
+    try {
+      const {
+        keyword = '',
+        page = 1,
+        limit = 10,
+        sort = 'created_at',
+        order = 'desc'
+      } = options;
+
+      const offset = (page - 1) * limit;
+      let whereConditions = [];
+      let queryParams = [];
+
+      // 构建搜索条件
+      if (keyword && keyword.trim()) {
+        const searchKeyword = `%${keyword.trim()}%`;
+        whereConditions.push('(p.name LIKE ? OR c.name LIKE ? OR p.tags LIKE ?)');
+        queryParams.push(searchKeyword, searchKeyword, searchKeyword);
+      }
+
+      const whereClause = whereConditions.length > 0 
+        ? 'WHERE ' + whereConditions.join(' AND ')
+        : '';
+
+      // 验证排序字段和方向
+      const allowedSortFields = ['created_at', 'price', 'name'];
+      const allowedOrders = ['asc', 'desc'];
+      const sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
+      const sortOrder = allowedOrders.includes(order.toLowerCase()) ? order.toUpperCase() : 'DESC';
+
+      // 获取总数
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        ${whereClause}
+      `;
+      
+      const countResult = await dbConnection.query(countQuery, queryParams);
+      const total = countResult[0].total;
+
+      // 获取商品列表（包含分类信息）
+      const listQuery = `
+        SELECT p.product_id, p.category_id, p.name, p.description, p.price, p.tags,
+               p.created_at, p.updated_at, 
+               c.name as category_name,
+               c.category_id
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        ${whereClause}
+        ORDER BY p.${sortField} ${sortOrder}
+        LIMIT ? OFFSET ?
+      `;
+
+      const products = await dbConnection.query(listQuery, [...queryParams, limit, offset]);
+
+      // 为每个商品获取图片和参数信息
+      const productsWithDetails = await Promise.all(
+        products.map(async (product) => {
+          // 获取图片
+          const imagesQuery = `
+            SELECT image_id, image_url, image_type, sort_order, created_at
+            FROM product_images
+            WHERE product_id = ?
+            ORDER BY sort_order ASC, created_at ASC
+          `;
+          
+          const images = await dbConnection.query(imagesQuery, [product.product_id]);
+
+          // 获取参数
+          const paramsQuery = `
+            SELECT param_id, param_key, param_value, created_at
+            FROM product_params
+            WHERE product_id = ?
+            ORDER BY param_id ASC
+          `;
+          
+          const params = await dbConnection.query(paramsQuery, [product.product_id]);
+          
+          return {
+            product_id: product.product_id,
+            category_id: product.category_id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            tags: product.tags,
+            created_at: product.created_at,
+            updated_at: product.updated_at,
+            category: {
+              category_id: product.category_id,
+              name: product.category_name
+            },
+            images: images.map(img => ({
+              image_id: img.image_id,
+              image_url: img.image_url,
+              image_type: img.image_type,
+              sort_order: img.sort_order,
+              created_at: img.created_at
+            })),
+            params: params.map(param => ({
+              param_id: param.param_id,
+              param_key: param.param_key,
+              param_value: param.param_value,
+              created_at: param.created_at
+            }))
+          };
+        })
+      );
+
+      // 计算分页信息
+      const totalPages = Math.ceil(total / limit);
+      const pagination = {
+        current_page: page,
+        total_pages: totalPages,
+        total_count: total,
+        per_page: limit,
+        has_next: page < totalPages,
+        has_prev: page > 1
+      };
+
+      return {
+        products: productsWithDetails,
+        pagination,
+        search_info: {
+          keyword: keyword.trim(),
+          total_found: total
+        }
+      };
+
+    } catch (error) {
+      console.error('搜索商品错误:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Product;

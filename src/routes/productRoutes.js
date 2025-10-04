@@ -72,6 +72,9 @@ router.post('/',
   ProductController.createProduct
 );
 
+// 搜索商品 - 公开访问
+router.get('/search', ProductController.searchProducts);
+
 // 获取商品列表 - 公开访问（可用于前端展示）
 router.get('/', ProductController.getProducts);
 

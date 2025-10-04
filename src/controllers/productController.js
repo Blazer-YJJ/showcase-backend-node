@@ -681,6 +681,75 @@ class ProductController {
     }
   }
 
+  // 搜索商品
+  static async searchProducts(req, res) {
+    try {
+      const {
+        q: keyword = '',
+        page = 1,
+        limit = 10,
+        sort = 'created_at',
+        order = 'desc'
+      } = req.query;
+
+      // 验证分页参数
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
+
+      if (isNaN(pageNum) || pageNum < 1) {
+        return res.status(400).json({
+          success: false,
+          message: '页码必须是大于0的数字'
+        });
+      }
+
+      if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+        return res.status(400).json({
+          success: false,
+          message: '每页数量必须是1-100之间的数字'
+        });
+      }
+
+      // 验证排序参数
+      const allowedSortFields = ['created_at', 'price', 'name'];
+      const allowedOrders = ['asc', 'desc'];
+      
+      if (!allowedSortFields.includes(sort)) {
+        return res.status(400).json({
+          success: false,
+          message: `排序字段无效，支持的字段: ${allowedSortFields.join(', ')}`
+        });
+      }
+
+      if (!allowedOrders.includes(order.toLowerCase())) {
+        return res.status(400).json({
+          success: false,
+          message: `排序方向无效，支持的方向: ${allowedOrders.join(', ')}`
+        });
+      }
+
+      const result = await Product.search({
+        keyword: keyword.trim(),
+        page: pageNum,
+        limit: limitNum,
+        sort,
+        order: order.toLowerCase()
+      });
+
+      res.json({
+        success: true,
+        message: '搜索成功',
+        data: result
+      });
+    } catch (error) {
+      console.error('搜索商品错误:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || '服务器内部错误'
+      });
+    }
+  }
+
 }
 
 module.exports = ProductController;
