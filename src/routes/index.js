@@ -25,6 +25,10 @@ router.get('/', (req, res) => {
       'POST /api/explore-selections - 添加精选商品（管理员权限）',
       'GET /api/main-promotions - 获取主推款式列表（公开接口）',
       'POST /api/main-promotions - 添加主推款式（管理员权限）',
+      'GET /api/announcements - 获取公告列表（公开接口）',
+      'GET /api/announcements/active - 获取启用公告列表（公开接口）',
+      'POST /api/announcements - 创建公告（管理员权限）',
+      'DELETE /api/announcements/:id - 删除公告（管理员权限）',
       'GET /api/health - 健康检查'
     ]
   });

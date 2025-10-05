@@ -19,6 +19,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
 const exploreSelectionRoutes = require('./routes/exploreSelectionRoutes');
 const mainPromotionRoutes = require('./routes/mainPromotionRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -94,6 +95,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/explore-selections', exploreSelectionRoutes);
 app.use('/api/main-promotions', mainPromotionRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 // 健康检查
 app.get('/health', async (req, res) => {
