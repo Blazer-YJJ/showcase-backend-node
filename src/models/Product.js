@@ -141,11 +141,11 @@ class Product {
       
       const products = await dbConnection.query(productQuery, [productId]);
       
-      if (products.length === 0) {
+      if (products[0].length === 0) {
         return null;
       }
 
-      const product = products[0];
+      const product = products[0][0];
 
       // 获取商品参数
       const paramsQuery = `
@@ -156,6 +156,7 @@ class Product {
       `;
       
       const params = await dbConnection.query(paramsQuery, [productId]);
+      const paramsData = params[0];
 
       // 获取商品图片
       const imagesQuery = `
@@ -166,14 +167,15 @@ class Product {
       `;
       
       const images = await dbConnection.query(imagesQuery, [productId]);
+      const imagesData = images[0];
 
       return {
         ...product,
-        params: params.map(param => ({
+        params: paramsData.map(param => ({
           param_key: param.param_key,
           param_value: param.param_value
         })),
-        images: images.map(image => ({
+        images: imagesData.map(image => ({
           image_id: image.image_id,
           image_url: image.image_url,
           image_type: image.image_type,
@@ -241,7 +243,7 @@ class Product {
       `;
       
       const countResult = await dbConnection.query(countQuery, queryParams);
-      const total = countResult[0].total;
+      const total = countResult[0][0].total;
 
       // 获取商品列表（包含分类路径）
       const listQuery = `
@@ -266,10 +268,11 @@ class Product {
       `;
 
       const products = await dbConnection.query(listQuery, [...queryParams, limit, offset]);
+      const productsData = products[0];
 
       // 为每个商品获取图片信息
       const productsWithImages = await Promise.all(
-        products.map(async (product) => {
+        productsData.map(async (product) => {
           const imagesQuery = `
             SELECT image_id, image_url, image_type, sort_order, created_at
             FROM product_images
@@ -278,6 +281,7 @@ class Product {
           `;
           
           const images = await dbConnection.query(imagesQuery, [product.product_id]);
+          const imagesData = images[0];
           
           return {
             product_id: product.product_id,
@@ -289,7 +293,7 @@ class Product {
             category_name: product.category_name,
             category_level: product.category_level,
             category_path: product.category_path,
-            images: images.map(image => ({
+            images: imagesData.map(image => ({
               image_id: image.image_id,
               image_url: image.image_url,
               image_type: image.image_type,
@@ -1008,7 +1012,7 @@ class Product {
       `;
       
       const countResult = await dbConnection.query(countQuery, queryParams);
-      const total = countResult[0].total;
+      const total = countResult[0][0].total;
 
       // 获取商品列表（包含分类信息）
       const listQuery = `
@@ -1024,10 +1028,11 @@ class Product {
       `;
 
       const products = await dbConnection.query(listQuery, [...queryParams, limit, offset]);
+      const productsData = products[0];
 
       // 为每个商品获取图片和参数信息
       const productsWithDetails = await Promise.all(
-        products.map(async (product) => {
+        productsData.map(async (product) => {
           // 获取图片
           const imagesQuery = `
             SELECT image_id, image_url, image_type, sort_order, created_at
@@ -1037,6 +1042,7 @@ class Product {
           `;
           
           const images = await dbConnection.query(imagesQuery, [product.product_id]);
+          const imagesData = images[0];
 
           // 获取参数
           const paramsQuery = `
@@ -1047,6 +1053,7 @@ class Product {
           `;
           
           const params = await dbConnection.query(paramsQuery, [product.product_id]);
+          const paramsData = params[0];
           
           return {
             product_id: product.product_id,
@@ -1061,14 +1068,14 @@ class Product {
               category_id: product.category_id,
               name: product.category_name
             },
-            images: images.map(img => ({
+            images: imagesData.map(img => ({
               image_id: img.image_id,
               image_url: img.image_url,
               image_type: img.image_type,
               sort_order: img.sort_order,
               created_at: img.created_at
             })),
-            params: params.map(param => ({
+            params: paramsData.map(param => ({
               param_id: param.param_id,
               param_key: param.param_key,
               param_value: param.param_value,

@@ -63,11 +63,11 @@ class Category {
       const sql = 'SELECT * FROM categories WHERE category_id = ?';
       const rows = await dbConnection.query(sql, [id]);
       
-      if (rows.length === 0) {
+      if (rows[0].length === 0) {
         return null;
       }
       
-      return new Category(rows[0]);
+      return new Category(rows[0][0]);
     } catch (error) {
       throw error;
     }
@@ -79,11 +79,11 @@ class Category {
       const sql = 'SELECT * FROM categories WHERE name = ?';
       const rows = await dbConnection.query(sql, [name]);
       
-      if (rows.length === 0) {
+      if (rows[0].length === 0) {
         return null;
       }
       
-      return new Category(rows[0]);
+      return new Category(rows[0][0]);
     } catch (error) {
       throw error;
     }
@@ -104,11 +104,11 @@ class Category {
       
       const rows = await dbConnection.query(sql, params);
       
-      if (rows.length === 0) {
+      if (rows[0].length === 0) {
         return null;
       }
       
-      return new Category(rows[0]);
+      return new Category(rows[0][0]);
     } catch (error) {
       throw error;
     }
@@ -138,7 +138,7 @@ class Category {
       let params = [parentId];
       
       const rows = await dbConnection.query(sql, params);
-      return rows.map(row => new Category(row));
+      return rows[0].map(row => new Category(row));
     } catch (error) {
       throw error;
     }
@@ -221,7 +221,7 @@ class Category {
       const childrenSql = 'SELECT COUNT(*) as count FROM categories WHERE parent_id = ?';
       const childrenResult = await dbConnection.query(childrenSql, [id]);
       
-      if (childrenResult[0].count > 0) {
+      if (childrenResult[0][0].count > 0) {
         throw new Error('无法删除分类，该分类下还有子分类');
       }
 
@@ -229,7 +229,7 @@ class Category {
       const productsSql = 'SELECT COUNT(*) as count FROM products WHERE category_id = ?';
       const productsResult = await dbConnection.query(productsSql, [id]);
       
-      if (productsResult[0].count > 0) {
+      if (productsResult[0][0].count > 0) {
         throw new Error('无法删除分类，该分类下还有商品');
       }
 
@@ -252,7 +252,7 @@ class Category {
       `;
 
       const rows = await dbConnection.query(sql);
-      return rows.map(row => new Category(row));
+      return rows[0].map(row => new Category(row));
     } catch (error) {
       throw error;
     }

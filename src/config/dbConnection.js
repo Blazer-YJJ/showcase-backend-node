@@ -102,7 +102,7 @@ class DatabaseConnection {
   async query(sql, params = []) {
     try {
       const [rows] = await this.pool.query(sql, params);
-      return rows;
+      return [rows];
     } catch (error) {
       logger.error('数据库查询错误:', error);
       throw error;

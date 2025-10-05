@@ -40,6 +40,7 @@ const adminAuth = async (req, res, next) => {
 
     // 将管理员信息添加到请求对象
     req.admin = admin.toSafeObject();
+    console.log('Admin auth success:', req.admin);
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
@@ -74,7 +75,9 @@ const adminPermission = (requiredLevels = ['super', 'admin', 'editor']) => {
       }
 
       // 检查管理员级别
+      console.log('Checking admin level:', req.admin.level, 'Required levels:', requiredLevels);
       if (!requiredLevels.includes(req.admin.level)) {
+        console.log('Permission denied: admin level not in required levels');
         return res.status(403).json({
           success: false,
           message: '访问被拒绝，权限不足'

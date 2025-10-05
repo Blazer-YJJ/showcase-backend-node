@@ -89,7 +89,7 @@ class User {
       // 获取总数
       const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`;
       const countResult = await dbConnection.query(countQuery, queryParams);
-      const total = countResult[0].total;
+      const total = countResult[0][0].total;
 
       // 获取用户列表
       const query = `
@@ -103,9 +103,10 @@ class User {
       // 为LIMIT和OFFSET添加参数
       const listParams = [...queryParams, limitNum, offset];
       const users = await dbConnection.query(query, listParams);
+      const usersData = users[0];
 
       return {
-        users: users.map(user => new User(user)),
+        users: usersData.map(user => new User(user)),
         pagination: {
           page: pageNum,
           limit: limitNum,
@@ -129,11 +130,11 @@ class User {
       
       const result = await dbConnection.query(query, [userId]);
       
-      if (result.length === 0) {
+      if (result[0].length === 0) {
         return null;
       }
 
-      return new User(result[0]);
+      return new User(result[0][0]);
     } catch (error) {
       throw error;
     }

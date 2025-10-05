@@ -2,7 +2,7 @@
  * @Author: JingChengCool jingchengcool@outlook.com
  * @Date: 2025-01-28 15:30:00
  * @LastEditors: JingChengCool jingchengcool@outlook.com
- * @LastEditTime: 2025-10-04 06:29:06
+ * @LastEditTime: 2025-10-04 19:19:44
  * @FilePath: \showcase-backend-node\src\controllers\productController.js
  * @Description: 商品控制器
  */

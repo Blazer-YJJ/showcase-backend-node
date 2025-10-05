@@ -17,6 +17,8 @@ const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
+const exploreSelectionRoutes = require('./routes/exploreSelectionRoutes');
+const mainPromotionRoutes = require('./routes/mainPromotionRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -90,6 +92,8 @@ app.use('/api/admins', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/explore-selections', exploreSelectionRoutes);
+app.use('/api/main-promotions', mainPromotionRoutes);
 
 // 健康检查
 app.get('/health', async (req, res) => {

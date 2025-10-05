@@ -31,7 +31,7 @@ class Admin {
         VALUES (?, ?, ?, ?)
       `;
       
-      const result = await dbConnection.query(query, [name, username, password, level]);
+      const [result] = await dbConnection.query(query, [name, username, password, level]);
       
       return {
         admin_id: result.insertId,
@@ -49,7 +49,7 @@ class Admin {
   static async findById(adminId) {
     try {
       const query = 'SELECT * FROM admins WHERE admin_id = ?';
-      const rows = await dbConnection.query(query, [adminId]);
+      const [rows] = await dbConnection.query(query, [adminId]);
       
       if (rows.length === 0) {
         return null;
@@ -65,7 +65,7 @@ class Admin {
   static async findByUsername(username) {
     try {
       const query = 'SELECT * FROM admins WHERE username = ?';
-      const rows = await dbConnection.query(query, [username]);
+      const [rows] = await dbConnection.query(query, [username]);
       
       if (rows.length === 0) {
         return null;
@@ -104,12 +104,12 @@ class Admin {
       const countResult = await dbConnection.query(countQuery, countParams);
       
       return {
-        admins: rows,
+        admins: rows[0],
         pagination: {
           page: pageNum,
           limit: limitNum,
-          total: countResult[0].total,
-          pages: Math.ceil(countResult[0].total / limitNum)
+          total: countResult[0][0].total,
+          pages: Math.ceil(countResult[0][0].total / limitNum)
         }
       };
     } catch (error) {
@@ -149,7 +149,7 @@ class Admin {
       values.push(adminId);
 
       const query = `UPDATE admins SET ${fields.join(', ')} WHERE admin_id = ?`;
-      const result = await dbConnection.query(query, values);
+      const [result] = await dbConnection.query(query, values);
 
       if (result.affectedRows === 0) {
         throw new Error('管理员不存在');
@@ -168,7 +168,7 @@ class Admin {
   static async delete(adminId) {
     try {
       const query = 'DELETE FROM admins WHERE admin_id = ?';
-      const result = await dbConnection.query(query, [adminId]);
+      const [result] = await dbConnection.query(query, [adminId]);
 
       if (result.affectedRows === 0) {
         throw new Error('管理员不存在');
@@ -194,7 +194,7 @@ class Admin {
         params.push(excludeId);
       }
 
-      const rows = await dbConnection.query(query, params);
+      const [rows] = await dbConnection.query(query, params);
       return rows[0].count > 0;
     } catch (error) {
       throw error;

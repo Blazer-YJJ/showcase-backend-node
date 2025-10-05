@@ -21,6 +21,10 @@ router.get('/', (req, res) => {
       'POST /api/products/batch/tags - 批量给多个商品添加标签',
       'POST /api/products/batch/create - 批量创建商品（根据图片名自动命名）',
       'GET /api/categories/all - 获取所有分类（无需认证）',
+      'GET /api/explore-selections - 获取精选商品列表（公开接口）',
+      'POST /api/explore-selections - 添加精选商品（管理员权限）',
+      'GET /api/main-promotions - 获取主推款式列表（公开接口）',
+      'POST /api/main-promotions - 添加主推款式（管理员权限）',
       'GET /api/health - 健康检查'
     ]
   });
