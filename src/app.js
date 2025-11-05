@@ -19,6 +19,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
 const exploreSelectionRoutes = require('./routes/exploreSelectionRoutes');
 const mainPromotionRoutes = require('./routes/mainPromotionRoutes');
+const hotProductRoutes = require('./routes/hotProductRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const aboutUsRoutes = require('./routes/aboutUsRoutes');
@@ -26,6 +27,8 @@ const bannerRoutes = require('./routes/bannerRoutes');
 const customerServiceRoutes = require('./routes/customerServiceRoutes');
 const limitedTimeActivityRoutes = require('./routes/limitedTimeActivityRoutes');
 const newArrivalAnnouncementRoutes = require('./routes/newArrivalAnnouncementRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const addressRoutes = require('./routes/addressRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -101,6 +104,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/explore-selections', exploreSelectionRoutes);
 app.use('/api/main-promotions', mainPromotionRoutes);
+app.use('/api/hot-products', hotProductRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/about-us', aboutUsRoutes);
@@ -108,6 +112,8 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/customer-service', customerServiceRoutes);
 app.use('/api/limited-time-activities', limitedTimeActivityRoutes);
 app.use('/api/new-arrival-announcements', newArrivalAnnouncementRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/addresses', addressRoutes);
 
 // 健康检查
 app.get('/health', async (req, res) => {

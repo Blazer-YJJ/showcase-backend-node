@@ -379,12 +379,30 @@ class ProductController {
   // 批量删除商品
   static async batchDeleteProducts(req, res) {
     try {
-      const { productIds } = req.body;
+      // 调试信息
+      console.log('批量删除商品请求体:', JSON.stringify(req.body));
+      
+      const { productIds, hot_ids } = req.body;
+
+      // 如果用户传递了 hot_ids，提示使用热门商品删除接口
+      if (hot_ids && !productIds) {
+        return res.status(400).json({
+          success: false,
+          message: '检测到您传递了 hot_ids 参数，如果您想删除热门商品，请使用 /api/hot-products/batch/delete 接口',
+          hint: '如果您想删除商品，请使用 productIds 参数',
+          correctFormat: {
+            deleteProducts: { productIds: [1, 2, 3] },
+            deleteHotProducts: '请使用接口: POST /api/hot-products/batch/delete，参数: { "hot_ids": [1, 2, 3] }'
+          }
+        });
+      }
 
       if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
         return res.status(400).json({
           success: false,
-          message: '商品ID数组不能为空'
+          message: '商品ID数组不能为空',
+          hint: '请使用 productIds 参数，格式: { "productIds": [1, 2, 3] }',
+          received: Object.keys(req.body || {})
         });
       }
 

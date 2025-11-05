@@ -2,7 +2,7 @@
  * @Author: JingChengCool jingchengcool@outlook.com
  * @Date: 2025-10-01 00:25:28
  * @LastEditors: JingChengCool jingchengcool@outlook.com
- * @LastEditTime: 2025-10-11 17:04:11
+ * @LastEditTime: 2025-11-05 23:31:05
  * @FilePath: \showcase-backend-node\src\routes\index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -35,6 +35,13 @@ router.get('/', (req, res) => {
       'DELETE /api/main-promotions/:id - 删除主推款式（管理员权限）',
       'POST /api/main-promotions/batch/sort - 批量更新主推款式排序（管理员权限）',
       'GET /api/main-promotions/admin/stats - 获取主推款式统计（管理员权限）',
+      'GET /api/hot-products - 获取热门款式列表（公开接口）',
+      'GET /api/hot-products/:id - 获取热门款式详情（公开接口）',
+      'POST /api/hot-products - 创建热门款式（管理员权限，支持单个和批量）',
+      'PUT /api/hot-products/:id - 更新热门款式排序（管理员权限）',
+      'POST /api/hot-products/batch/delete - 批量删除热门款式（管理员权限）',
+      'POST /api/hot-products/batch/sort - 批量更新热门款式排序（管理员权限）',
+      'GET /api/hot-products/admin/stats - 获取热门款式统计（管理员权限）',
       'GET /api/announcements - 获取公告列表（公开接口）',
       'GET /api/announcements/active - 获取启用公告列表（公开接口）',
       'POST /api/announcements - 创建公告（管理员权限）',
@@ -79,6 +86,21 @@ router.get('/', (req, res) => {
       'PUT /api/new-arrival-announcements/:id/status - 切换上新公告状态（管理员权限）',
       'DELETE /api/new-arrival-announcements/:id - 删除上新公告（管理员权限）',
       'POST /api/new-arrival-announcements/batch/delete - 批量删除上新公告（管理员权限）',
+      'POST /api/orders - 创建订单（用户权限）',
+      'GET /api/orders - 获取当前用户的订单列表（用户权限）',
+      'GET /api/orders/:id - 获取订单详情（用户权限）',
+      'PUT /api/orders/:id - 更新订单（用户权限）',
+      'DELETE /api/orders/:id - 删除订单（用户权限）',
+      'GET /api/orders/admin/list - 获取所有订单列表（管理员权限）',
+      'GET /api/orders/admin/:id - 获取订单详情（管理员权限）',
+      'PUT /api/orders/admin/:id - 更新订单（管理员权限）',
+      'PUT /api/orders/admin/:id/status - 修改订单状态（管理员权限）',
+      'DELETE /api/orders/admin/:id - 删除订单（管理员权限）',
+      'POST /api/addresses - 创建地址（用户权限）',
+      'GET /api/addresses - 获取当前用户的所有地址（用户权限）',
+      'GET /api/addresses/:id - 获取地址详情（用户权限）',
+      'PUT /api/addresses/:id - 更新地址（用户权限）',
+      'DELETE /api/addresses/:id - 删除地址（用户权限）',
       'GET /api/health - 健康检查'
     ]
   });
