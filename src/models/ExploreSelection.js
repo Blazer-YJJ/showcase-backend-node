@@ -155,6 +155,7 @@ class ExploreSelection {
         
         const created = [];
         const skipped = [];
+        const insertedIds = [];
         
         for (let i = 0; i < product_ids.length; i++) {
           const product_id = product_ids[i];
@@ -173,9 +174,11 @@ class ExploreSelection {
               continue;
             }
 
-            // 检查是否已被精选
-            const isSelected = await this.isProductSelected(product_id);
-            if (isSelected) {
+            // 检查是否已被精选（在事务中检查）
+            const checkQuery = 'SELECT selection_id FROM explore_selections WHERE product_id = ?';
+            const [checkRows] = await connection.query(checkQuery, [product_id]);
+            
+            if (checkRows.length > 0) {
               skipped.push({
                 product_id,
                 reason: '该商品已被精选'
@@ -190,10 +193,7 @@ class ExploreSelection {
             `;
             
             const [result] = await connection.query(query, [product_id, sort_order]);
-            
-            // 获取创建的商品详情
-            const selectionDetail = await this.getById(result.insertId);
-            created.push(selectionDetail);
+            insertedIds.push(result.insertId);
             
           } catch (error) {
             skipped.push({
@@ -204,6 +204,14 @@ class ExploreSelection {
         }
         
         await connection.commit();
+        
+        // 提交事务后，使用全局连接查询完整信息
+        for (const insertId of insertedIds) {
+          const selectionDetail = await this.getById(insertId);
+          if (selectionDetail) {
+            created.push(selectionDetail);
+          }
+        }
         
         return {
           created,

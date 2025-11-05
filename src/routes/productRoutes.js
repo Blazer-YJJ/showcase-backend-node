@@ -63,6 +63,57 @@ const validateFiles = (req, res, next) => {
   next();
 };
 
+// 批量创建专用的文件验证中间件 - 支持多个独立的images字段
+const validateBatchFiles = (req, res, next) => {
+  let files = [];
+  
+  if (req.files) {
+    // upload.any() 返回的是数组，每个文件对象有 fieldname 属性
+    if (Array.isArray(req.files)) {
+      // 过滤出所有 fieldname 为 'images' 的文件
+      // 支持多个独立的images字段，每个字段一个图片
+      files = req.files.filter(file => file.fieldname === 'images');
+    } else {
+      // 如果是对象形式（upload.array的结果），提取所有名为'images'的文件
+      if (req.files.images) {
+        // 如果images是数组，直接使用
+        if (Array.isArray(req.files.images)) {
+          files = req.files.images;
+        } else {
+          // 如果images是单个文件，转换为数组
+          files = [req.files.images];
+        }
+      } else {
+        // 如果没有images字段，尝试从所有字段中提取
+        files = Object.values(req.files).flat();
+      }
+    }
+  } else if (req.file) {
+    // 单个文件上传（fieldname必须是images）
+    if (req.file.fieldname === 'images') {
+      files = [req.file];
+    }
+  }
+  
+  if (files.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: '至少需要上传一张图片，且字段名必须为images'
+    });
+  }
+  
+  const validation = validateUploadedFiles(files);
+  if (!validation.valid) {
+    return res.status(400).json({
+      success: false,
+      message: '文件验证失败',
+      errors: validation.errors
+    });
+  }
+  req.validFiles = validation.validFiles;
+  next();
+};
+
 // 商品路由 - 需要管理员权限（支持文件上传）
 router.post('/', 
   adminAuth, 
@@ -94,11 +145,12 @@ router.post('/batch/delete', adminAuth, adminPermission(['super']), ProductContr
 router.post('/batch/tags', adminAuth, adminPermission(['super', 'admin']), ProductController.batchAddTags);
 
 // 批量创建商品（根据图片文件自动命名）- 需要管理员权限
+// 支持多个独立的images字段，每个字段一个图片
 router.post('/batch/create', 
   adminAuth, 
   adminPermission(['super', 'admin']), 
-  upload.array('images', 100), // 最多100张图片
-  validateFiles,
+  upload.any(), // 使用any()接收所有文件，支持多个独立的images字段
+  validateBatchFiles,
   ProductController.batchCreateProductsFromFiles
 );
 

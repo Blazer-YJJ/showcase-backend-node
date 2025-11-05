@@ -20,6 +20,12 @@ const productRoutes = require('./routes/productRoutes');
 const exploreSelectionRoutes = require('./routes/exploreSelectionRoutes');
 const mainPromotionRoutes = require('./routes/mainPromotionRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
+const aboutUsRoutes = require('./routes/aboutUsRoutes');
+const bannerRoutes = require('./routes/bannerRoutes');
+const customerServiceRoutes = require('./routes/customerServiceRoutes');
+const limitedTimeActivityRoutes = require('./routes/limitedTimeActivityRoutes');
+const newArrivalAnnouncementRoutes = require('./routes/newArrivalAnnouncementRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,8 +49,8 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false  // 禁用COEP策略
 })); // 安全头
 app.use(logger.middleware); // 自定义日志
-app.use(express.json()); // JSON解析
-app.use(express.urlencoded({ extended: true })); // URL编码解析
+app.use(express.json({ limit: '50mb' })); // JSON解析
+app.use(express.urlencoded({ extended: true, limit: '50mb' })); // URL编码解析
 
 // 静态文件服务 - 提供uploads目录访问
 app.use('/uploads', (req, res, next) => {
@@ -96,6 +102,12 @@ app.use('/api/products', productRoutes);
 app.use('/api/explore-selections', exploreSelectionRoutes);
 app.use('/api/main-promotions', mainPromotionRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/about-us', aboutUsRoutes);
+app.use('/api/banners', bannerRoutes);
+app.use('/api/customer-service', customerServiceRoutes);
+app.use('/api/limited-time-activities', limitedTimeActivityRoutes);
+app.use('/api/new-arrival-announcements', newArrivalAnnouncementRoutes);
 
 // 健康检查
 app.get('/health', async (req, res) => {

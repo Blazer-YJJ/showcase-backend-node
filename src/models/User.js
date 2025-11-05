@@ -151,11 +151,12 @@ class User {
       
       const result = await dbConnection.query(query, [username]);
       
-      if (result.length === 0) {
+      // 检查查询结果，result[0] 是实际的查询结果数组
+      if (result[0].length === 0) {
         return null;
       }
 
-      return new User(result[0]);
+      return new User(result[0][0]);
     } catch (error) {
       throw error;
     }
@@ -268,8 +269,18 @@ class User {
   // 验证密码
   async validatePassword(password) {
     try {
+      // 检查参数是否有效
+      if (!password || !this.password) {
+        console.error('密码验证失败：缺少必要参数', {
+          hasPassword: !!password,
+          hasStoredPassword: !!this.password
+        });
+        return false;
+      }
+
       return await bcrypt.compare(password, this.password);
     } catch (error) {
+      console.error('密码验证错误:', error);
       throw error;
     }
   }

@@ -1,4 +1,6 @@
 const dbConnection = require('../config/dbConnection');
+const path = require('path');
+const fs = require('fs');
 
 class Product {
   constructor(data) {
@@ -824,14 +826,14 @@ class Product {
 
   // 批量创建商品（从上传的文件）
   static async batchCreateProductsFromFiles({ category_id, tags, files }) {
-    const connection = await db.getConnection();
+    const connection = await dbConnection.getConnection();
     
     try {
       // 开始事务
       await connection.beginTransaction();
       
       // 获取分类名称
-      const categoryQuery = 'SELECT name FROM categories WHERE id = ?';
+      const categoryQuery = 'SELECT name FROM categories WHERE category_id = ?';
       const [categoryResult] = await connection.execute(categoryQuery, [category_id]);
       const categoryName = categoryResult.length > 0 ? categoryResult[0].name : '未知分类';
       
@@ -847,8 +849,10 @@ class Product {
           // 获取文件扩展名
           const ext = path.extname(file.originalname).toLowerCase();
           
-          // 生成唯一的文件名（使用时间戳）
-          const uniqueFilename = `product_${Date.now()}_${i}${ext}`;
+          // 生成唯一的文件名（使用时间戳+随机数+索引，避免冲突）
+          const timestamp = Date.now();
+          const random = Math.floor(Math.random() * 10000);
+          const uniqueFilename = `product_${timestamp}_${random}_${i}${ext}`;
           
           // 构建完整的图片URL
           const imageUrl = `/uploads/products/${uniqueFilename}`;
@@ -870,15 +874,10 @@ class Product {
           
           const productId = result.insertId;
 
-          // 处理商品标签
-          if (tags) {
-            await this.assignTagsToProduct(connection, productId, tags);
-          }
-
-          // 添加图片到image表
+          // 添加图片到product_images表
           const insertImageQuery = `
-            INSERT INTO images (product_id, image_url, image_type, sort_order, created_at)
-            VALUES (?, ?, 'main', 0, NOW())
+            INSERT INTO product_images (product_id, image_url, image_type, sort_order)
+            VALUES (?, ?, 'main', 0)
           `;
           
           await connection.execute(insertImageQuery, [
@@ -969,6 +968,62 @@ class Product {
     }
     
     return name;
+  }
+
+  // 验证分类是否存在
+  static async validateCategoryExists(category_id) {
+    try {
+      const connection = await dbConnection.getConnection();
+      try {
+        const [result] = await connection.execute(
+          'SELECT category_id FROM categories WHERE category_id = ?',
+          [category_id]
+        );
+        return result.length > 0;
+      } finally {
+        connection.release();
+      }
+    } catch (error) {
+      console.error('验证分类失败:', error);
+      return false;
+    }
+  }
+
+  // 验证标签格式
+  static validateTagsFormat(tags) {
+    // tags可以为空或null
+    if (!tags || tags.trim() === '') {
+      return { valid: true };
+    }
+
+    // tags必须是字符串
+    if (typeof tags !== 'string') {
+      return {
+        valid: false,
+        message: '标签必须是字符串格式'
+      };
+    }
+
+    // 验证标签长度（单个标签不超过50字符，总长度不超过500字符）
+    const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+    
+    if (tags.length > 500) {
+      return {
+        valid: false,
+        message: '标签总长度不能超过500个字符'
+      };
+    }
+
+    for (const tag of tagArray) {
+      if (tag.length > 50) {
+        return {
+          valid: false,
+          message: `标签 "${tag}" 长度不能超过50个字符`
+        };
+      }
+    }
+
+    return { valid: true };
   }
 
   // 搜索商品（支持商品名称、分类名称、标签搜索）
