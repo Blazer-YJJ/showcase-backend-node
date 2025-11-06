@@ -304,6 +304,50 @@ CREATE TABLE `new_arrival_products` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `order_after_sale_items`
+--
+
+DROP TABLE IF EXISTS `order_after_sale_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_after_sale_items` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '关联ID',
+  `after_sale_id` int NOT NULL COMMENT '售后ID',
+  `product_id` int NOT NULL COMMENT '售后的商品ID',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_after_sale_product` (`after_sale_id`,`product_id`),
+  KEY `idx_after_sale_items_product` (`product_id`),
+  CONSTRAINT `order_after_sale_items_ibfk_1` FOREIGN KEY (`after_sale_id`) REFERENCES `order_after_sales` (`after_sale_id`) ON DELETE CASCADE,
+  CONSTRAINT `order_after_sale_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单售后商品关联表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `order_after_sales`
+--
+
+DROP TABLE IF EXISTS `order_after_sales`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_after_sales` (
+  `after_sale_id` int NOT NULL AUTO_INCREMENT COMMENT '售后ID',
+  `order_id` int NOT NULL COMMENT '需要售后的订单ID',
+  `reason` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '售后原因',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '售后具体内容',
+  `status` enum('pending','processing','approved','rejected','completed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pending' COMMENT '售后状态',
+  `start_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '售后开始时间',
+  `end_time` timestamp NULL DEFAULT NULL COMMENT '结束时间',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`after_sale_id`),
+  KEY `idx_after_sales_order` (`order_id`),
+  KEY `idx_after_sales_status` (`status`),
+  CONSTRAINT `order_after_sales_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `user_orders` (`order_id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单售后表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `order_items`
 --
 
@@ -314,6 +358,7 @@ CREATE TABLE `order_items` (
   `order_item_id` int NOT NULL AUTO_INCREMENT COMMENT '订单项ID',
   `order_id` int NOT NULL COMMENT '订单ID',
   `product_id` int NOT NULL COMMENT '商品ID',
+  `quantity` int NOT NULL DEFAULT '1' COMMENT '商品数量',
   `item_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '单个商品备注',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -322,7 +367,7 @@ CREATE TABLE `order_items` (
   KEY `idx_order_items_product` (`product_id`),
   CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `user_orders` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单项表（订单中的商品）';
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单项表（订单中的商品）';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -466,6 +511,7 @@ CREATE TABLE `user_orders` (
   `product_id` int NOT NULL COMMENT '商品ID',
   `item_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '单个商品备注',
   `order_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '整体订单备注',
+  `total_quantity` int NOT NULL DEFAULT '0' COMMENT '订单总商品数量',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`order_id`),
@@ -476,7 +522,7 @@ CREATE TABLE `user_orders` (
   CONSTRAINT `user_orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `user_orders_ibfk_2` FOREIGN KEY (`address_id`) REFERENCES `user_addresses` (`address_id`) ON DELETE CASCADE,
   CONSTRAINT `user_orders_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户订单表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户订单表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -512,4 +558,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-06  0:08:40
+-- Dump completed on 2025-11-06 23:58:08

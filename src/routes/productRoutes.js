@@ -11,7 +11,8 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const ProductController = require('../controllers/productController');
-const { adminAuth, adminPermission } = require('../middleware/adminAuth');
+const ProductExportController = require('../controllers/productExportController');
+const { adminAuth, adminPermission, adminOrUserAuth } = require('../middleware/adminAuth');
 const { validateUploadedFiles } = require('../utils/fileUploadHelper');
 
 // 配置multer用于内存存储
@@ -122,6 +123,16 @@ router.post('/',
   validateFiles,
   ProductController.createProduct
 );
+
+// PDF导出路由 - 支持管理员和用户认证
+// 导出全部商品PDF
+router.get('/export/pdf/all', adminOrUserAuth, ProductExportController.exportAllProducts);
+
+// 导出指定分类的商品PDF
+router.get('/export/pdf/category/:category_id', adminOrUserAuth, ProductExportController.exportProductsByCategory);
+
+// 导出搜索结果的商品PDF
+router.get('/export/pdf/search', adminOrUserAuth, ProductExportController.exportProductsBySearch);
 
 // 搜索商品 - 公开访问
 router.get('/search', ProductController.searchProducts);

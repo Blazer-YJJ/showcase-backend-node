@@ -1,0 +1,81 @@
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+const path = require('path');
+
+// 测试轮播图上传接口
+async function testBannerUpload() {
+  try {
+    console.log('🚀 开始测试轮播图上传接口...\n');
+
+    // 1. 先获取管理员token
+    console.log('1. 获取管理员认证token...');
+    const loginResponse = await axios.post('http://localhost:3000/api/admin/login', {
+      username: 'admin',
+      password: 'admin123'
+    });
+
+    if (!loginResponse.data.success) {
+      throw new Error('登录失败: ' + loginResponse.data.message);
+    }
+
+    const token = loginResponse.data.data.token;
+    console.log('✅ 管理员登录成功，token获取成功\n');
+
+    // 2. 创建一个测试图片文件
+    console.log('2. 创建测试图片文件...');
+    const testImagePath = path.join(__dirname, 'test-image.jpg');
+    
+    // 创建一个简单的1x1像素的JPEG图片数据
+    const jpegData = Buffer.from([
+      0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x48,
+      0x00, 0x48, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43, 0x00, 0x08, 0x06, 0x06, 0x07, 0x06, 0x05, 0x08,
+      0x07, 0x07, 0x07, 0x09, 0x09, 0x08, 0x0A, 0x0C, 0x14, 0x0D, 0x0C, 0x0B, 0x0B, 0x0C, 0x19, 0x12,
+      0x13, 0x0F, 0x14, 0x1D, 0x1A, 0x1F, 0x1E, 0x1D, 0x1A, 0x1C, 0x1C, 0x20, 0x24, 0x2E, 0x27, 0x20,
+      0x22, 0x2C, 0x23, 0x1C, 0x1C, 0x28, 0x37, 0x29, 0x2C, 0x30, 0x31, 0x34, 0x34, 0x34, 0x1F, 0x27,
+      0x39, 0x3D, 0x38, 0x32, 0x3C, 0x2E, 0x33, 0x34, 0x32, 0xFF, 0xC0, 0x00, 0x11, 0x08, 0x00, 0x01,
+      0x00, 0x01, 0x01, 0x01, 0x11, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, 0xFF, 0xC4, 0x00, 0x14,
+      0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x08, 0xFF, 0xC4, 0x00, 0x14, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x0C, 0x03, 0x01,
+      0x00, 0x02, 0x11, 0x03, 0x11, 0x00, 0x3F, 0x00, 0x00, 0xFF, 0xD9
+    ]);
+
+    fs.writeFileSync(testImagePath, jpegData);
+    console.log('✅ 测试图片文件创建成功\n');
+
+    // 3. 测试轮播图上传
+    console.log('3. 测试轮播图上传...');
+    const formData = new FormData();
+    formData.append('title', '测试轮播图');
+    formData.append('description', '这是一个测试轮播图');
+    formData.append('sort_order', '1');
+    formData.append('image_url', fs.createReadStream(testImagePath));
+
+    const uploadResponse = await axios.post('http://localhost:3000/api/banners', formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        ...formData.getHeaders()
+      }
+    });
+
+    console.log('✅ 轮播图上传成功！');
+    console.log('响应数据:', JSON.stringify(uploadResponse.data, null, 2));
+
+    // 4. 清理测试文件
+    console.log('\n4. 清理测试文件...');
+    fs.unlinkSync(testImagePath);
+    console.log('✅ 测试文件清理完成');
+
+  } catch (error) {
+    console.error('❌ 测试失败:', error.message);
+    if (error.response) {
+      console.error('响应状态:', error.response.status);
+      console.error('响应数据:', JSON.stringify(error.response.data, null, 2));
+    }
+    console.error('错误详情:', error);
+  }
+}
+
+// 运行测试
+testBannerUpload();

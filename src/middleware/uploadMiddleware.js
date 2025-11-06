@@ -50,6 +50,9 @@ const uploadFeedbackImage = upload.single('feedback_image');
 // 轮播图图片上传中间件 - 支持多个字段名
 const uploadBannerImage = upload.single('image_url');
 
+// PDF背景图片上传中间件
+const uploadPdfBackgroundImage = upload.single('pdf_background_image');
+
 // 错误处理中间件
 const handleUploadError = (error, req, res, next) => {
   if (error instanceof multer.MulterError) {
@@ -86,6 +89,7 @@ const handleUploadError = (error, req, res, next) => {
 module.exports = {
   uploadFeedbackImage,
   uploadBannerImage,
+  uploadPdfBackgroundImage,
   handleUploadError
 };
 

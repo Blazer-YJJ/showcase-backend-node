@@ -322,6 +322,234 @@ class Product {
     }
   }
 
+  // 获取所有商品（用于导出，不分页）
+  static async findAllForExport(options = {}) {
+    try {
+      const {
+        category_id = null,
+        name = null,
+        price_min = null,
+        price_max = null,
+        tags = null
+      } = options;
+
+      let whereConditions = [];
+      let queryParams = [];
+
+      // 构建WHERE条件
+      if (category_id) {
+        whereConditions.push('p.category_id = ?');
+        queryParams.push(category_id);
+      }
+
+      if (name) {
+        whereConditions.push('p.name LIKE ?');
+        queryParams.push(`%${name}%`);
+      }
+
+      if (price_min !== null) {
+        whereConditions.push('p.price >= ?');
+        queryParams.push(parseFloat(price_min));
+      }
+
+      if (price_max !== null) {
+        whereConditions.push('p.price <= ?');
+        queryParams.push(parseFloat(price_max));
+      }
+
+      if (tags) {
+        whereConditions.push('p.tags LIKE ?');
+        queryParams.push(`%${tags}%`);
+      }
+
+      const whereClause = whereConditions.length > 0 
+        ? 'WHERE ' + whereConditions.join(' AND ')
+        : '';
+
+      // 获取商品列表（包含分类信息）
+      const listQuery = `
+        SELECT p.product_id, p.category_id, p.name, p.description, p.price, p.tags,
+               p.created_at, p.updated_at, 
+               c.name as category_name,
+               c.level as category_level
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        ${whereClause}
+        ORDER BY p.created_at DESC
+      `;
+
+      const products = await dbConnection.query(listQuery, queryParams);
+      const productsData = products[0];
+
+      // 为每个商品获取图片和参数信息
+      const productsWithDetails = await Promise.all(
+        productsData.map(async (product) => {
+          // 获取图片
+          const imagesQuery = `
+            SELECT image_id, image_url, image_type, sort_order, created_at
+            FROM product_images
+            WHERE product_id = ?
+            ORDER BY 
+              CASE WHEN image_type = 'main' THEN 0 ELSE 1 END,
+              sort_order ASC, 
+              created_at ASC
+          `;
+          
+          const images = await dbConnection.query(imagesQuery, [product.product_id]);
+          const imagesData = images[0];
+
+          // 获取参数
+          const paramsQuery = `
+            SELECT param_id, param_key, param_value, created_at
+            FROM product_params
+            WHERE product_id = ?
+            ORDER BY param_id ASC
+          `;
+          
+          const params = await dbConnection.query(paramsQuery, [product.product_id]);
+          const paramsData = params[0];
+          
+          return {
+            product_id: product.product_id,
+            category_id: product.category_id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            tags: product.tags,
+            category_name: product.category_name,
+            category_level: product.category_level,
+            images: imagesData.map(image => ({
+              image_id: image.image_id,
+              image_url: image.image_url,
+              image_type: image.image_type,
+              sort_order: image.sort_order,
+              created_at: image.created_at
+            })),
+            params: paramsData.map(param => ({
+              param_id: param.param_id,
+              param_key: param.param_key,
+              param_value: param.param_value,
+              created_at: param.created_at
+            })),
+            created_at: product.created_at,
+            updated_at: product.updated_at
+          };
+        })
+      );
+
+      return productsWithDetails;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // 搜索商品（用于导出，不分页）
+  static async searchForExport(options = {}) {
+    try {
+      const {
+        keyword = '',
+        sort = 'created_at',
+        order = 'desc'
+      } = options;
+
+      let whereConditions = [];
+      let queryParams = [];
+
+      // 构建搜索条件
+      if (keyword && keyword.trim()) {
+        const searchKeyword = `%${keyword.trim()}%`;
+        whereConditions.push('(p.name LIKE ? OR c.name LIKE ? OR p.tags LIKE ?)');
+        queryParams.push(searchKeyword, searchKeyword, searchKeyword);
+      }
+
+      const whereClause = whereConditions.length > 0 
+        ? 'WHERE ' + whereConditions.join(' AND ')
+        : '';
+
+      // 验证排序字段和方向
+      const allowedSortFields = ['created_at', 'price', 'name'];
+      const allowedOrders = ['asc', 'desc'];
+      const sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
+      const sortOrder = allowedOrders.includes(order.toLowerCase()) ? order.toUpperCase() : 'DESC';
+
+      // 获取商品列表（包含分类信息）
+      const listQuery = `
+        SELECT p.product_id, p.category_id, p.name, p.description, p.price, p.tags,
+               p.created_at, p.updated_at, 
+               c.name as category_name,
+               c.level as category_level
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        ${whereClause}
+        ORDER BY p.${sortField} ${sortOrder}
+      `;
+
+      const products = await dbConnection.query(listQuery, queryParams);
+      const productsData = products[0];
+
+      // 为每个商品获取图片和参数信息
+      const productsWithDetails = await Promise.all(
+        productsData.map(async (product) => {
+          // 获取图片
+          const imagesQuery = `
+            SELECT image_id, image_url, image_type, sort_order, created_at
+            FROM product_images
+            WHERE product_id = ?
+            ORDER BY 
+              CASE WHEN image_type = 'main' THEN 0 ELSE 1 END,
+              sort_order ASC, 
+              created_at ASC
+          `;
+          
+          const images = await dbConnection.query(imagesQuery, [product.product_id]);
+          const imagesData = images[0];
+
+          // 获取参数
+          const paramsQuery = `
+            SELECT param_id, param_key, param_value, created_at
+            FROM product_params
+            WHERE product_id = ?
+            ORDER BY param_id ASC
+          `;
+          
+          const params = await dbConnection.query(paramsQuery, [product.product_id]);
+          const paramsData = params[0];
+          
+          return {
+            product_id: product.product_id,
+            category_id: product.category_id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            tags: product.tags,
+            category_name: product.category_name,
+            category_level: product.category_level,
+            images: imagesData.map(img => ({
+              image_id: img.image_id,
+              image_url: img.image_url,
+              image_type: img.image_type,
+              sort_order: img.sort_order,
+              created_at: img.created_at
+            })),
+            params: paramsData.map(param => ({
+              param_id: param.param_id,
+              param_key: param.param_key,
+              param_value: param.param_value,
+              created_at: param.created_at
+            })),
+            created_at: product.created_at,
+            updated_at: product.updated_at
+          };
+        })
+      );
+
+      return productsWithDetails;
+    } catch (error) {
+      console.error('搜索商品错误:', error);
+      throw error;
+    }
+  }
+
   // 更新商品
   static async update(productId, updateData) {
     const connection = await dbConnection.getConnection();

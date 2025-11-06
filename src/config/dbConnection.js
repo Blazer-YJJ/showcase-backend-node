@@ -14,10 +14,7 @@ const dbConfig = {
     password: 'YJJ010317..',
     charset: process.env.DB_CHARSET || 'utf8mb4',
     timezone: process.env.DB_TIMEZONE || '+08:00',
-    connectionLimit: 10,
-    acquireTimeout: 60000,
-    timeout: 60000,
-    reconnect: true
+    connectionLimit: 10
   },
   production: {
     host: 'localhost',
@@ -27,10 +24,7 @@ const dbConfig = {
     password: 'YJJ010317..',
     charset: process.env.DB_CHARSET || 'utf8mb4',
     timezone: process.env.DB_TIMEZONE || '+08:00',
-    connectionLimit: 20,
-    acquireTimeout: 60000,
-    timeout: 60000,
-    reconnect: true
+    connectionLimit: 20
   },
   test: {
     host: 'localhost',
@@ -40,10 +34,7 @@ const dbConfig = {
     password: 'YJJ010317..',
     charset: process.env.DB_CHARSET || 'utf8mb4',
     timezone: process.env.DB_TIMEZONE || '+08:00',
-    connectionLimit: 5,
-    acquireTimeout: 60000,
-    timeout: 60000,
-    reconnect: true
+    connectionLimit: 5
   }
 };
 

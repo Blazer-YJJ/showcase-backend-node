@@ -29,6 +29,10 @@ const limitedTimeActivityRoutes = require('./routes/limitedTimeActivityRoutes');
 const newArrivalAnnouncementRoutes = require('./routes/newArrivalAnnouncementRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const addressRoutes = require('./routes/addressRoutes');
+const orderAfterSaleRoutes = require('./routes/orderAfterSaleRoutes');
+const statisticsRoutes = require('./routes/statisticsRoutes');
+const pdfConfigRoutes = require('./routes/pdfConfigRoutes');
+const pdfFileRoutes = require('./routes/pdfFileRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -114,9 +118,13 @@ app.use('/api/limited-time-activities', limitedTimeActivityRoutes);
 app.use('/api/new-arrival-announcements', newArrivalAnnouncementRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/order-after-sales', orderAfterSaleRoutes);
+app.use('/api/statistics', statisticsRoutes);
+app.use('/api/pdf-config', pdfConfigRoutes);
+app.use('/api/pdf-files', pdfFileRoutes);
 
 // 健康检查
-app.get('/health', async (req, res) => {
+app.get('/api/health', async (req, res) => {
   try {
     const dbStatus = await dbConnection.checkConnection();
     const redisStatus = await redisConnection.ping();
@@ -169,7 +177,7 @@ async function initializeConnections() {
     app.listen(PORT, () => {
       console.log('🎉 服务启动完成!');
       console.log(`🌐 服务器运行在: http://localhost:${PORT}`);
-      console.log(`📊 健康检查: http://localhost:${PORT}/health`);
+      console.log(`📊 健康检查: http://localhost:${PORT}/api/health`);
       console.log('📝 日志级别:', process.env.LOG_LEVEL || 'info');
     });
     

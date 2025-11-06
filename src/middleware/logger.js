@@ -7,7 +7,7 @@ const logFormat = ':method :url :status :res[content-length] - :response-time ms
 const morganLogger = morgan(logFormat, {
   skip: (req, res) => {
     // 跳过健康检查的日志
-    return req.url === '/health';
+    return req.url === '/api/health';
   }
 });
 
