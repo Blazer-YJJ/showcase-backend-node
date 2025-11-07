@@ -120,6 +120,12 @@ router.get('/', (req, res) => {
       'DELETE /api/pdf-config/:id - 删除PDF配置（管理员权限）',
       'GET /api/pdf-files - 获取所有PDF文件列表（管理员权限）',
       'POST /api/pdf-files/batch/delete - 批量删除PDF文件（管理员权限）',
+      'POST /api/image-search/batch-add - 批量添加商品到百度图库（管理员权限）',
+      'POST /api/image-search/search - 图片搜索接口（公开接口）',
+      'POST /api/image-search/batch-delete - 批量从百度图库删除商品（管理员权限）',
+      'GET /api/image-search/status/:product_id - 获取商品的百度图库状态（管理员权限）',
+      'GET /api/image-search/not-indexed - 获取未入库商品列表（管理员权限）',
+      'GET /api/image-search/indexed - 获取已入库商品列表（管理员权限）',
       'GET /api/health - 健康检查'
     ]
   });

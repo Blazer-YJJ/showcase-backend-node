@@ -371,6 +371,27 @@ CREATE TABLE `order_items` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `pdf_config`
+--
+
+DROP TABLE IF EXISTS `pdf_config`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pdf_config` (
+  `config_id` int NOT NULL AUTO_INCREMENT COMMENT '配置ID',
+  `pdf_file_company_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'PDF文件公司名字',
+  `pdf_title_company_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'PDF中的标题公司名字',
+  `pdf_background_image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'PDF文件中的背景图路径',
+  `products_per_row` enum('2','3') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '2' COMMENT 'PDF每行商品数量（2个或3个）',
+  `is_active` tinyint(1) DEFAULT '1' COMMENT '是否启用（1=启用，0=禁用）',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`config_id`),
+  KEY `idx_pdf_config_active` (`is_active`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PDF配置表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `product_images`
 --
 
@@ -423,10 +444,15 @@ CREATE TABLE `products` (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '商品简介',
   `price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '商品价格',
   `tags` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品标签',
+  `baidu_cont_sign` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '百度图像搜索图片签名（用于检索、更新、删除操作）',
+  `baidu_image_search_status` tinyint(1) DEFAULT '0' COMMENT '百度图像搜索入库状态（0=未入库，1=已入库，2=入库失败）',
+  `baidu_image_search_time` timestamp NULL DEFAULT NULL COMMENT '百度图像搜索入库时间',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`product_id`),
   KEY `idx_products_category` (`category_id`),
+  KEY `idx_products_baidu_cont_sign` (`baidu_cont_sign`),
+  KEY `idx_products_baidu_status` (`baidu_image_search_status`),
   CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -558,4 +584,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-06 23:58:08
+-- Dump completed on 2025-11-07 10:49:42
