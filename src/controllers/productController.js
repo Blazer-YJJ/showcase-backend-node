@@ -699,11 +699,13 @@ class ProductController {
     }
   }
 
-  // 搜索商品
+  // 搜索商品（输入一个关键字，自动匹配商品名称、标签、分类名称）
   static async searchProducts(req, res) {
     try {
       const {
-        q: keyword = '',
+        q: keyword = '',        // 搜索关键字（自动在商品名称、标签、分类名称中搜索）
+        price_min = null,       // 最低价格（可选）
+        price_max = null,       // 最高价格（可选）
         page = 1,
         limit = 10,
         sort = 'created_at',
@@ -728,6 +730,40 @@ class ProductController {
         });
       }
 
+      // 验证价格参数
+      if (price_min !== null && price_min !== undefined && price_min !== '') {
+        const minPrice = parseFloat(price_min);
+        if (isNaN(minPrice) || minPrice < 0) {
+          return res.status(400).json({
+            success: false,
+            message: '最低价格必须是有效的非负数'
+          });
+        }
+      }
+
+      if (price_max !== null && price_max !== undefined && price_max !== '') {
+        const maxPrice = parseFloat(price_max);
+        if (isNaN(maxPrice) || maxPrice < 0) {
+          return res.status(400).json({
+            success: false,
+            message: '最高价格必须是有效的非负数'
+          });
+        }
+      }
+
+      // 验证价格范围合理性
+      if (price_min !== null && price_min !== undefined && price_min !== '' &&
+          price_max !== null && price_max !== undefined && price_max !== '') {
+        const minPrice = parseFloat(price_min);
+        const maxPrice = parseFloat(price_max);
+        if (minPrice > maxPrice) {
+          return res.status(400).json({
+            success: false,
+            message: '最低价格不能大于最高价格'
+          });
+        }
+      }
+
       // 验证排序参数
       const allowedSortFields = ['created_at', 'price', 'name'];
       const allowedOrders = ['asc', 'desc'];
@@ -748,6 +784,8 @@ class ProductController {
 
       const result = await Product.search({
         keyword: keyword.trim(),
+        price_min: price_min !== null && price_min !== undefined && price_min !== '' ? price_min : null,
+        price_max: price_max !== null && price_max !== undefined && price_max !== '' ? price_max : null,
         page: pageNum,
         limit: limitNum,
         sort,

@@ -1254,11 +1254,13 @@ class Product {
     return { valid: true };
   }
 
-  // 搜索商品（支持商品名称、分类名称、标签搜索）
+  // 搜索商品（输入一个关键字，自动在商品名称、分类名称、标签中搜索）
   static async search(options = {}) {
     try {
       const {
-        keyword = '',
+        keyword = '',           // 搜索关键字（自动在商品名称、分类名称、标签中搜索）
+        price_min = null,       // 最低价格
+        price_max = null,       // 最高价格
         page = 1,
         limit = 10,
         sort = 'created_at',
@@ -1269,11 +1271,28 @@ class Product {
       let whereConditions = [];
       let queryParams = [];
 
-      // 构建搜索条件
+      // 关键字搜索：自动在商品名称、分类名称、标签中搜索
       if (keyword && keyword.trim()) {
         const searchKeyword = `%${keyword.trim()}%`;
         whereConditions.push('(p.name LIKE ? OR c.name LIKE ? OR p.tags LIKE ?)');
         queryParams.push(searchKeyword, searchKeyword, searchKeyword);
+      }
+
+      // 价格范围搜索
+      if (price_min !== null && price_min !== undefined && price_min !== '') {
+        const minPrice = parseFloat(price_min);
+        if (!isNaN(minPrice) && minPrice >= 0) {
+          whereConditions.push('p.price >= ?');
+          queryParams.push(minPrice);
+        }
+      }
+
+      if (price_max !== null && price_max !== undefined && price_max !== '') {
+        const maxPrice = parseFloat(price_max);
+        if (!isNaN(maxPrice) && maxPrice >= 0) {
+          whereConditions.push('p.price <= ?');
+          queryParams.push(maxPrice);
+        }
       }
 
       const whereClause = whereConditions.length > 0 
@@ -1379,13 +1398,28 @@ class Product {
         has_prev: page > 1
       };
 
+      // 构建搜索信息
+      const searchInfo = {
+        total_found: total
+      };
+      
+      // 添加搜索关键字
+      if (keyword && keyword.trim()) {
+        searchInfo.keyword = keyword.trim();
+      }
+      
+      // 添加价格范围
+      if (price_min !== null && price_min !== undefined && price_min !== '') {
+        searchInfo.price_min = parseFloat(price_min);
+      }
+      if (price_max !== null && price_max !== undefined && price_max !== '') {
+        searchInfo.price_max = parseFloat(price_max);
+      }
+
       return {
         products: productsWithDetails,
         pagination,
-        search_info: {
-          keyword: keyword.trim(),
-          total_found: total
-        }
+        search_info: searchInfo
       };
 
     } catch (error) {
