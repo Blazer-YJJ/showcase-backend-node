@@ -34,6 +34,7 @@ const statisticsRoutes = require('./routes/statisticsRoutes');
 const pdfConfigRoutes = require('./routes/pdfConfigRoutes');
 const pdfFileRoutes = require('./routes/pdfFileRoutes');
 const imageSearchRoutes = require('./routes/imageSearchRoutes');
+const favoriteRoutes = require('./routes/favoriteRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -124,6 +125,7 @@ app.use('/api/statistics', statisticsRoutes);
 app.use('/api/pdf-config', pdfConfigRoutes);
 app.use('/api/pdf-files', pdfFileRoutes);
 app.use('/api/image-search', imageSearchRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 // 健康检查
 app.get('/api/health', async (req, res) => {

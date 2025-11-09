@@ -126,6 +126,11 @@ router.get('/', (req, res) => {
       'GET /api/image-search/status/:product_id - 获取商品的百度图库状态（管理员权限）',
       'GET /api/image-search/not-indexed - 获取未入库商品列表（管理员权限）',
       'GET /api/image-search/indexed - 获取已入库商品列表（管理员权限）',
+      'POST /api/favorites - 添加收藏（用户权限）',
+      'DELETE /api/favorites - 取消收藏（用户权限）',
+      'GET /api/favorites - 获取当前用户的收藏列表（用户权限）',
+      'GET /api/favorites/check/:product_id - 检查商品是否已收藏（用户权限）',
+      'POST /api/favorites/batch/delete - 批量取消收藏（用户权限）',
       'GET /api/health - 健康检查'
     ]
   });
