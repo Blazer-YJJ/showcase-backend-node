@@ -236,7 +236,7 @@ const loginUser = async (req, res) => {
         memberType: user.member_type
       },
       process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
+      { expiresIn: '7d' }
     );
 
     res.json({
