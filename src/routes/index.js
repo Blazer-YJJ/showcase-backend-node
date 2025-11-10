@@ -51,7 +51,7 @@ router.get('/', (req, res) => {
       'GET /api/feedback/:id - 获取反馈详情（管理员权限）',
       'DELETE /api/feedback/:id - 删除反馈（管理员权限）',
       'POST /api/feedback/batch/delete - 批量删除反馈（管理员权限）',
-      'GET /api/about-us - 获取关于我们信息（管理员权限）',
+      'GET /api/about-us - 获取关于我们信息（公开接口）',
       'POST /api/about-us - 创建关于我们信息（管理员权限）',
       'GET /api/about-us/all - 获取所有关于我们信息（管理员权限）',
       'GET /api/about-us/:id - 获取关于我们信息详情（管理员权限）',

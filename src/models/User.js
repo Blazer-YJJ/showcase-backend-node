@@ -285,6 +285,36 @@ class User {
     }
   }
 
+  // 获取用户信息（包含地址）
+  static async findByIdWithAddresses(userId) {
+    try {
+      if (!userId || isNaN(userId)) {
+        throw new Error('用户ID不能为空且必须是有效数字');
+      }
+
+      // 获取用户基本信息
+      const user = await this.findById(userId);
+      if (!user) {
+        return null;
+      }
+
+      // 获取用户地址列表
+      const UserAddress = require('./UserAddress');
+      const addresses = await UserAddress.findByUserId(userId);
+
+      return {
+        user_id: user.user_id,
+        name: user.name,
+        username: user.username,
+        member_type: user.member_type,
+        created_at: user.created_at,
+        addresses: addresses.map(addr => addr.toSafeObject())
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // 获取安全的用户信息（不包含密码）
   toSafeObject() {
     return {

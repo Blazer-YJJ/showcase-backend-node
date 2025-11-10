@@ -27,6 +27,44 @@ class Order {
     this.product = data.product;
   }
 
+  // 生成传统格式的订单号
+  // 格式：YYMMDDHH（8位）+ 随机数（1位）= 9位数字
+  // 最大值：999999999，在 int 类型范围内（int 最大值：2147483647）
+  static async generateOrderId(connection) {
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+      // 生成订单号：YYMMDDHH（8位）+ 随机数（1位）= 9位数字
+      const now = new Date();
+      const year = String(now.getFullYear()).slice(-2); // 取年份后2位
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hour = String(now.getHours()).padStart(2, '0');
+      const randomNum = Math.floor(Math.random() * 10); // 1位随机数（0-9）
+      
+      // 组合：YYMMDDHH + 随机数（1位）
+      const orderId = parseInt(`${year}${month}${day}${hour}${randomNum}`);
+      
+      // 检查订单号是否已存在
+      const [existingRows] = await connection.execute(
+        'SELECT order_id FROM user_orders WHERE order_id = ?',
+        [orderId]
+      );
+      
+      if (existingRows.length === 0) {
+        return orderId;
+      }
+      
+      attempts++;
+    }
+    
+    // 如果10次尝试都失败，使用时间戳的后9位 + 随机数
+    const timestamp = Date.now();
+    const randomNum = Math.floor(Math.random() * 10);
+    return parseInt(String(timestamp).slice(-9) + String(randomNum));
+  }
+
   // 创建订单（支持多个商品）
   static async create(orderData) {
     const connection = await dbConnection.getConnection();
@@ -118,14 +156,15 @@ class Order {
         throw new Error(`商品不存在: ${missingIds.join(', ')}`);
       }
 
-      // 插入订单主表数据（保留product_id和item_note字段以兼容旧数据，但使用第一个商品）
-      const [result] = await connection.execute(
-        `INSERT INTO user_orders (user_id, address_id, product_id, order_status, item_note, order_note, total_quantity) 
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [user_id, address_id, items[0].product_id, order_status, items[0].item_note || null, order_note, totalQuantity]
-      );
+      // 生成传统格式的订单号
+      const orderId = await this.generateOrderId(connection);
 
-      const orderId = result.insertId;
+      // 插入订单主表数据（明确指定 order_id）
+      const [result] = await connection.execute(
+        `INSERT INTO user_orders (order_id, user_id, address_id, product_id, order_status, item_note, order_note, total_quantity) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [orderId, user_id, address_id, items[0].product_id, order_status, items[0].item_note || null, order_note, totalQuantity]
+      );
 
       // 创建订单项（使用OrderItem模型，传递connection以在同一个事务中执行）
       await OrderItem.createBatch(orderId, items, connection);

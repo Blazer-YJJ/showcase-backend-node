@@ -29,10 +29,18 @@ class FeedbackController {
   static async createFeedback(req, res) {
     try {
       const {
-        user_id,
         title,
         content
       } = req.body;
+
+      // 从认证信息中获取用户ID
+      const user_id = req.user?.user_id;
+      if (!user_id) {
+        return res.status(401).json({
+          success: false,
+          message: '用户未认证'
+        });
+      }
 
       // 处理上传的图片文件 - 参考商品接口的实现方式
       let feedback_image = null;

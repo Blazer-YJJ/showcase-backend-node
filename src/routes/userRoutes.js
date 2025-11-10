@@ -10,10 +10,15 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const { adminAuth, adminOrAbove } = require('../middleware/adminAuth');
+const { userAuth } = require('../middleware/userAuth');
 
 // 用户登录路由（不需要认证）
 // POST /api/users/login - 用户登录
 router.post('/login', userController.loginUser);
+
+// 用户个人路由（需要用户认证）
+// GET /api/users/profile - 获取当前登录用户的会员账号信息
+router.get('/profile', userAuth, userController.getMyProfile);
 
 // 用户管理路由（需要管理员认证）
 router.use(adminAuth);

@@ -10,17 +10,10 @@
 // 验证创建反馈的数据
 const validateCreateFeedback = (req, res, next) => {
   try {
-    const { user_id, title, content } = req.body;
+    const { title, content } = req.body;
     const feedback_image = req.file ? req.file.path : req.body.feedback_image;
 
     // 验证必填字段
-    if (!user_id) {
-      return res.status(400).json({
-        success: false,
-        message: '用户ID不能为空'
-      });
-    }
-
     if (!title) {
       return res.status(400).json({
         success: false,
@@ -32,22 +25,6 @@ const validateCreateFeedback = (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: '反馈内容不能为空'
-      });
-    }
-
-    // 验证用户ID类型和格式
-    if (typeof user_id !== 'number' && typeof user_id !== 'string') {
-      return res.status(400).json({
-        success: false,
-        message: '用户ID必须是数字类型'
-      });
-    }
-
-    const userId = parseInt(user_id);
-    if (isNaN(userId) || userId <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: '用户ID必须是有效的正整数'
       });
     }
 

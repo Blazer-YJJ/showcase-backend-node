@@ -10,10 +10,10 @@
 const AboutUs = require('../models/AboutUs');
 
 class AboutUsController {
-  // 获取关于我们信息（管理员接口）
+  // 获取关于我们信息（公开接口）
   static async getAboutUs(req, res) {
     try {
-      const aboutUs = await AboutUs.findForAdmin();
+      const aboutUs = await AboutUs.findActive();
 
       if (!aboutUs) {
         return res.status(404).json({

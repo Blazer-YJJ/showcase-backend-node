@@ -13,8 +13,8 @@ const AboutUsController = require('../controllers/aboutUsController');
 const { adminAuth, anyAdmin } = require('../middleware/adminAuth');
 const { validateCreateAboutUs, validateUpdateAboutUs, validateQueryParams } = require('../validators/aboutUsValidator');
 
-// 获取关于我们信息（管理员权限）
-router.get('/', adminAuth, anyAdmin, AboutUsController.getAboutUs);
+// 获取关于我们信息（公开接口）
+router.get('/', AboutUsController.getAboutUs);
 
 // 创建关于我们信息（管理员权限）
 router.post('/', adminAuth, anyAdmin, validateCreateAboutUs, AboutUsController.createAboutUs);

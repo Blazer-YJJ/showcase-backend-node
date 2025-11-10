@@ -256,11 +256,59 @@ const loginUser = async (req, res) => {
   }
 };
 
+// 获取当前登录用户的会员账号信息
+const getMyProfile = async (req, res) => {
+  try {
+    // 从认证中间件获取用户ID
+    const user_id = req.user.user_id;
+
+    // 获取用户信息（包含地址）
+    const userInfo = await User.findByIdWithAddresses(user_id);
+
+    if (!userInfo) {
+      return res.status(404).json({
+        success: false,
+        message: '用户不存在'
+      });
+    }
+
+    // 格式化地址信息（将地址列表转换为联系地址字符串）
+    let contactAddress = '';
+    if (userInfo.addresses && userInfo.addresses.length > 0) {
+      // 如果有多个地址，可以取第一个，或者合并所有地址
+      // 这里取第一个地址作为联系地址
+      const firstAddress = userInfo.addresses[0];
+      contactAddress = `${firstAddress.address} (${firstAddress.name}, ${firstAddress.phone})`;
+    }
+
+    res.json({
+      success: true,
+      message: '获取会员账号信息成功',
+      data: {
+        user_id: userInfo.user_id,
+        name: userInfo.name,
+        username: userInfo.username,
+        member_type: userInfo.member_type,
+        created_at: userInfo.created_at,
+        contact_address: contactAddress,
+        addresses: userInfo.addresses || []
+      }
+    });
+  } catch (error) {
+    console.error('Get my profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: '获取会员账号信息失败'
+    });
+  }
+};
+
 module.exports = {
   createUser,
   getUsers,
   getUserById,
   updateUser,
   deleteUser,
-  loginUser
+  loginUser,
+  getMyProfile
 };
