@@ -159,7 +159,7 @@ class LimitedTimeActivity {
 
       const activity = rows[0];
 
-      // 获取关联的商品
+      // 获取关联的商品（包含图片信息）
       const [productRows] = await connection.execute(
         `SELECT p.product_id, p.name, p.price, p.description, p.category_id, p.tags
          FROM activity_products ap
@@ -169,7 +169,30 @@ class LimitedTimeActivity {
         [activityId]
       );
 
-      activity.products = productRows;
+      // 为每个商品获取图片信息
+      const productsWithImages = await Promise.all(
+        productRows.map(async (product) => {
+          const [imageRows] = await connection.execute(
+            `SELECT image_id, image_url, image_type, sort_order
+             FROM product_images
+             WHERE product_id = ?
+             ORDER BY sort_order ASC, image_id ASC`,
+            [product.product_id]
+          );
+          
+          return {
+            ...product,
+            images: imageRows.map(img => ({
+              image_id: img.image_id,
+              image_url: img.image_url,
+              image_type: img.image_type,
+              sort_order: img.sort_order
+            }))
+          };
+        })
+      );
+
+      activity.products = productsWithImages;
 
       return activity;
     } catch (error) {
@@ -216,7 +239,7 @@ class LimitedTimeActivity {
         queryParams
       );
 
-      // 为每个活动获取关联的商品
+      // 为每个活动获取关联的商品（包含图片信息）
       const activitiesWithProducts = await Promise.all(
         rows.map(async (activity) => {
           const [productRows] = await connection.execute(
@@ -227,7 +250,31 @@ class LimitedTimeActivity {
              ORDER BY ap.id ASC`,
             [activity.activity_id]
           );
-          activity.products = productRows;
+          
+          // 为每个商品获取图片信息
+          const productsWithImages = await Promise.all(
+            productRows.map(async (product) => {
+              const [imageRows] = await connection.execute(
+                `SELECT image_id, image_url, image_type, sort_order
+                 FROM product_images
+                 WHERE product_id = ?
+                 ORDER BY sort_order ASC, image_id ASC`,
+                [product.product_id]
+              );
+              
+              return {
+                ...product,
+                images: imageRows.map(img => ({
+                  image_id: img.image_id,
+                  image_url: img.image_url,
+                  image_type: img.image_type,
+                  sort_order: img.sort_order
+                }))
+              };
+            })
+          );
+          
+          activity.products = productsWithImages;
           return activity;
         })
       );
@@ -485,7 +532,7 @@ class LimitedTimeActivity {
         [now, now]
       );
 
-      // 为每个活动获取关联的商品
+      // 为每个活动获取关联的商品（包含图片信息）
       const activitiesWithProducts = await Promise.all(
         rows.map(async (activity) => {
           const [productRows] = await connection.execute(
@@ -496,7 +543,31 @@ class LimitedTimeActivity {
              ORDER BY ap.id ASC`,
             [activity.activity_id]
           );
-          activity.products = productRows;
+          
+          // 为每个商品获取图片信息
+          const productsWithImages = await Promise.all(
+            productRows.map(async (product) => {
+              const [imageRows] = await connection.execute(
+                `SELECT image_id, image_url, image_type, sort_order
+                 FROM product_images
+                 WHERE product_id = ?
+                 ORDER BY sort_order ASC, image_id ASC`,
+                [product.product_id]
+              );
+              
+              return {
+                ...product,
+                images: imageRows.map(img => ({
+                  image_id: img.image_id,
+                  image_url: img.image_url,
+                  image_type: img.image_type,
+                  sort_order: img.sort_order
+                }))
+              };
+            })
+          );
+          
+          activity.products = productsWithImages;
           return activity;
         })
       );
